@@ -1,0 +1,23 @@
+Typ obliczen: SIMD
+Liczba liczb: 2048
+Sredni czas [ns]:
++ 5680
+- 5535
+* 5368
+/ 5454
+
+Typ obliczen: SIMD
+Liczba liczb: 4096
+Sredni czas [ns]:
++ 10596
+- 10831
+* 11116
+/ 10677
+
+Typ obliczen: SIMD
+Liczba liczb: 8192
+Sredni czas [ns]:
++ 22843
+- 21447
+* 21832
+/ 22751
