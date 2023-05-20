@@ -9,4 +9,8 @@ Implemented operations:
 * Subtraction
 * Multiplication
 
-For compilation, please use the provided Makefile..
+Please use the provided Makefile for compilation. Results can be checked in GDB (refer to the commands in the given .s file).
+
+## License
+
+This code is released under the MIT License.
