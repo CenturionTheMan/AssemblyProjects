@@ -1,71 +1,71 @@
-#Program odejmuje dwie liczby, zakłada ze sa rownej dlugosci
-#Wynik w gdb - x /5x $esp
+# The program subtracts two numbers, assuming they are of equal length.
+# Result in gdb: - x /5x $esp
 .section .data
-liczba1: #Pierwsza liczba (odjemna)
+number1: # First number (minuend)
     .long 0x10000000, 0x7000000F, 0x10000000, 0x02510000
-    liczba1_len = (.-liczba1) #Ilosc bajtow zajmowanych przez liczbe1
-    liczba1_amount = liczba1_len/4; #Ilosc liczb 4 bajtowych w liczbie 1
+    number1_len = (.-number1) # Number of bytes occupied by number1
+    number1_amount = number1_len/4; # Number of 4-byte numbers in number1
 
-liczba2: #Druga liczba (odjemnik)
-    .long 0x00000000, 0x50000000, 0xF0000000, 0x01400000
-    liczba2_len = (.-liczba2) #Ilosc bajtow zajmowanych przez liczbe2
-    liczba2_amount = liczba2_len/4; #Ilosc liczb 4 bajtowych w liczbie 2
+number2: # Second number (subtrahend)
+    .long 0xf0000000, 0x50000000, 0xF0000000, 0x01400000
+    number2_len = (.-number2) # Number of bytes occupied by number2
+    number2_amount = number2_len/4; # Number of 4-byte numbers in number2
 
-#WYNIKI CZASTKOWE DLA TYCH WARTOSCI:
-# ffffffff | (taken) d0000000 | 2000000e | (taken) 20000000 | 1110000
+# INTERMEDIATE RESULTS FOR THESE VALUES:
+# ffffffff | (taken) 20000000 | 2000000e | (taken) 20000000 | 1110000
 
 .section .text
 .global _start
 
-#Deklaracje stalych
+# Constant Declarations
 SYSEXIT = 1
 EXIT_SUCCESS = 0
 INTERUPT = 0x80
 
-#entry point
+# Entry point
 _start:
     clc
     jmp F_MAIN_ADD
 
 F_MAIN_ADD:
-    #esi - Indexer zmiennej liczba1 i liczba2
-    movl $liczba1_amount, %esi
+    # esi - Indexer for number1 and number2 variables
+    movl $number1_amount, %esi
 
     LOOP_BEG:
-        #zmnijeszanie indexu
+        # Decrease the index
         decl %esi
-        #odejmowanie z przeniesieniem podliczb
-        movl liczba1(,%esi,4), %eax
+        # Subtraction with borrow of sub-numbers
+        movl number1(,%esi,4), %eax
     C1:
-        sbbl liczba2(,%esi,4), %eax
+        sbbl number2(,%esi,4), %eax
         pushl %eax
     STACK_UPDATE:
 
-        #jezeli koniec liczby to zobacz czy nie ma przeniesienia
+        # Check if it's the end of the number and there is no borrow
         pushf
         cmpl $0, %esi
         je SUB_IF_OVERFLOW_EQUAL
         popf
-        #inczej wracaj na poczatek petli
+        # Otherwise, go back to the beginning of the loop
         jmp LOOP_BEG 
 
 SUB_IF_OVERFLOW_EQUAL:
-    #jezeli nie ma przeniesienia, zakoncz
+    # If there is no borrow, finish
     popf
     jnc END
-    #zerowanie indexu
+    # Reset the index
     xor %eax, %eax
-    #dodanie przeniesienia jezeli jest
+    # Add the borrow if present
     movl $0xffffffff, %eax
-    #wrzucenie wyniku na index 0 do zmiennej result
+    # Store the result at index 0 in the variable 'result'
     OVERFLOW:
     pushl %eax
-    #wywolanie bloku przerwania
+    # Invoke the interrupt block
     jmp END
 
-#Konczy program
+# End the program
 END:
+    hlt
     movl $SYSEXIT, %eax
     movl $EXIT_SUCCESS, %ebx
     int $INTERUPT
-   
