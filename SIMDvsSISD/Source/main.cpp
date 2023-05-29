@@ -4,26 +4,29 @@
 #include <chrono>
 #include <limits>
 #include <fstream>
+#include <iomanip>
 
 struct Vector4
 {
-    float nums[4];
+    float x, y, z, w;
 
     Vector4() {}
 
-    Vector4(float sub3, float sub2, float sub1, float sub0)
+    Vector4(float x, float y, float z, float w)
     {
-        this->nums[3] = sub3;
-        this->nums[2] = sub2;
-        this->nums[1] = sub1;
-        this->nums[0] = sub0;
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        this->w = w;
     }
 
     std::string ToString()
     {
         std::stringstream stream;
-        stream.precision(2);
-        stream << nums[3] << "|" << nums[2] << "|" << nums[1] << "|" << nums[0] << std::endl;
+        stream   << std::setfill(' ') << std::setw(5) << std::fixed << std::setprecision(2) << x << " | "
+                 << std::setfill(' ') << std::setw(5) << std::fixed << std::setprecision(2) << y << " | " 
+                 << std::setfill(' ') << std::setw(5) << std::fixed << std::setprecision(2) << z << " | " 
+                 << std::setfill(' ') << std::setw(5) << std::fixed << std::setprecision(2) << w << std::endl;
         return stream.str();
     }
 };
@@ -45,8 +48,8 @@ Vector4 SIMDadd(Vector4 v1 ,Vector4 v2, long &timeTaken)
         "movups %2, %%xmm1\n"
         "addps %%xmm1, %%xmm0\n"
         "movups %%xmm0, %0"
-        : "=m" (result.nums)
-        : "m" (v1.nums), "m" (v2.nums)
+        : "=m" (result)
+        : "m" (v1), "m" (v2)
         : "xmm1", "xmm0"
     );
     auto stop = std::chrono::high_resolution_clock::now();
@@ -70,8 +73,8 @@ Vector4 SIMDsub(Vector4 v1 ,Vector4 v2, long &timeTaken)
         "movups %2, %%xmm1\n"
         "subps %%xmm1, %%xmm0\n"
         "movups %%xmm0, %0"
-        : "=m" (result.nums)
-        : "m" (v1.nums), "m" (v2.nums)
+        : "=m" (result)
+        : "m" (v1), "m" (v2)
         : "xmm1", "xmm0"
     );
     auto stop = std::chrono::high_resolution_clock::now();
@@ -95,8 +98,8 @@ Vector4 SIMDmul(Vector4 v1 ,Vector4 v2, long &timeTaken)
         "movups %2, %%xmm1\n"
         "mulps %%xmm1, %%xmm0\n"
         "movups %%xmm0, %0"
-        : "=m" (result.nums)
-        : "m" (v1.nums), "m" (v2.nums)
+        : "=m" (result)
+        : "m" (v1), "m" (v2)
         : "xmm1", "xmm0"
     );
     auto stop = std::chrono::high_resolution_clock::now();
@@ -120,8 +123,8 @@ Vector4 SIMDdiv(Vector4 v1 ,Vector4 v2, long &timeTaken)
         "movups %2, %%xmm1\n"
         "divps %%xmm1, %%xmm0\n"
         "movups %%xmm0, %0"
-        : "=m" (result.nums)
-        : "m" (v1.nums), "m" (v2.nums)
+        : "=m" (result)
+        : "m" (v1), "m" (v2)
         : "xmm1", "xmm0"
     );
     auto stop = std::chrono::high_resolution_clock::now();
@@ -354,11 +357,41 @@ void WriteToFile(std::string path, std::string fileContent)
     out.close();
 }
 
+void TestOperations()
+{
+    long time;
+
+    Vector4 v1 = Vector4(1.5,2.5,3.5,4.5);
+    Vector4 v2 = Vector4(5,32.2,10,9.5);
+    std::cout << "v1: " << v1.ToString();
+    std::cout << "v2: " << v2.ToString();
+    std::cout 
+            << "SIMD\n" 
+            << "ADD: " << SIMDadd(v1, v2, time).ToString()
+            << "SUB: " << SIMDsub(v1, v2, time).ToString()
+            << "MUL: " << SIMDmul(v1, v2, time).ToString()
+            << "DIV: " << SIMDdiv(v1, v2, time).ToString() << std::endl;
+
+
+    float f1 = 0.5;
+    float f2 = 2.1;
+    std::cout << "f1: " << f1 << std::endl;
+    std::cout << "f2: " << f2 << std::endl;
+    std::cout 
+            << "SISD\n" 
+            << "ADD: " << SISDadd(f1, f2, time) << std::endl
+            << "SUB: " << SISDsub(f1, f2, time) << std::endl
+            << "MUL: " << SISDmul(f1, f2, time) << std::endl
+            << "DIV: " << SISDdiv(f1, f2, time) << std::endl;
+}
+
 /// @brief The main function that performs the tests and writes the results to files. 
 int main()
 {
-    int repsPerTest = 10;
+    TestOperations();
+    return 0;
 
+    int repsPerTest = 10;
     float min = std::numeric_limits<float>::min();
     float max = std::numeric_limits<float>::max();
 
