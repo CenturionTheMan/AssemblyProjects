@@ -357,6 +357,7 @@ void WriteToFile(std::string path, std::string fileContent)
     out.close();
 }
 
+/// @brief Function will test given operations
 void TestOperations()
 {
     long time;
@@ -388,8 +389,8 @@ void TestOperations()
 /// @brief The main function that performs the tests and writes the results to files. 
 int main()
 {
-    TestOperations();
-    return 0;
+    //TestOperations();
+    //return 0;
 
     int repsPerTest = 10;
     float min = std::numeric_limits<float>::min();

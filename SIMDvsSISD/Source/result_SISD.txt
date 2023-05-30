@@ -1,23 +1,23 @@
 Typ obliczen: SISD
 Liczba liczb: 2048
 Sredni czas [ns]:
-+ 23156
-- 20868
-* 21382
-/ 21412
++ 23203
+- 25996
+* 23269
+/ 23391
 
 Typ obliczen: SISD
 Liczba liczb: 4096
 Sredni czas [ns]:
-+ 42887
-- 43184
-* 41890
-/ 42177
++ 41847
+- 42239
+* 41575
+/ 43075
 
 Typ obliczen: SISD
 Liczba liczb: 8192
 Sredni czas [ns]:
-+ 86705
-- 83663
-* 84097
-/ 83607
++ 82362
+- 82882
+* 82561
+/ 82446
